@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Books</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Available Books</h1>
+        <table id="booksTable" border="1">
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+        <button class="back-button" onclick="window.location.href='index.html'">Back</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch and display books from the database
+            $.get('fetch_books.php', function(data) {
+                try {
+                    const books = JSON.parse(data);
+                    let booksTableBody = '';
+                    books.forEach(book => {
+                        booksTableBody += `<tr>
+                            <td>${book.ISBN}</td>
+                            <td>${book.Title}</td>
+                            <td>${book.Author}</td>
+                        </tr>`;
+                    });
+                    $('#booksTable tbody').html(booksTableBody);
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

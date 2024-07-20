@@ -9,37 +9,9 @@
 <body>
     <div class="container">
         <h1>Library Book Renting</h1>
-        <form id="rentForm" method="post" action="rent.php">
-            <div>
-                <label for="user_id">User ID:</label>
-                <input type="text" id="user_id" name="user_id" required>
-            </div>
-            <div>
-                <label for="admin_id">Admin ID:</label>
-                <input type="text" id="admin_id" name="admin_id" required>
-            </div>
-            <div>
-                <label for="borrow_date">Borrow Date:</label>
-                <input type="date" id="borrow_date" name="borrow_date" required>
-            </div>
-            <div>
-                <label for="return_date">Return Date:</label>
-                <input type="date" id="return_date" name="return_date" required>
-            </div>
-            <div>
-                <label>Books:</label>
-                <div id="books">
-                    <div class="book">
-                        <input type="text" name="isbn[]" placeholder="Book ISBN" required>
-                        <button type="button" class="remove-book">Remove</button>
-                    </div>
-                </div>
-                <button type="button" id="addBook">Add Book</button>
-            </div>
-            <button type="submit">Rent Books</button>
-        </form>
+        <button onclick="window.location.href='available_books.html'">Available Books</button>
+        <button onclick="window.location.href='rent_books.html'">Rent Books</button>
+        <button onclick="window.location.href='rented_books.html'">Rented Books</button>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="scripts.js"></script>
 </body>
 </html>

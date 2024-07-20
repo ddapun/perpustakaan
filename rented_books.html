@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rented Books</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Rented Books</h1>
+        <table id="rentedBooksTable" border="1">
+            <thead>
+                <tr>
+                    <th>Admin Name</th>
+                    <th>Borrower Name</th>
+                    <th>Book Title</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+        <button class="back-button" onclick="window.location.href='index.html'">Back</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch and display rented books from the database
+            $.get('fetch_rented_books.php', function(data) {
+                try {
+                    const rentedBooks = JSON.parse(data);
+                    let rentedBooksTableBody = '';
+                    rentedBooks.forEach(book => {
+                        rentedBooksTableBody += `<tr>
+                            <td>${book.Admin_Name}</td>
+                            <td>${book.Borrower_Name}</td>
+                            <td>${book.Book_Title}</td>
+                            <td>${book.Borrow_Date}</td>
+                            <td>${book.Return_Date}</td>
+                        </tr>`;
+                    });
+                    $('#rentedBooksTable tbody').html(rentedBooksTableBody);
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
