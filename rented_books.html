@@ -12,40 +12,51 @@
         <table id="rentedBooksTable" border="1">
             <thead>
                 <tr>
+                    <th>Borrow ID</th>
+                    <th>User Name</th>
                     <th>Admin Name</th>
-                    <th>Borrower Name</th>
-                    <th>Book Title</th>
                     <th>Borrow Date</th>
                     <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Rows will be populated by JavaScript -->
             </tbody>
         </table>
-        <button class="back-button" onclick="window.location.href='index.html'">Back</button>
+        <button id="backButton">Back</button>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
             // Fetch and display rented books from the database
             $.get('fetch_rented_books.php', function(data) {
-                try {
-                    const rentedBooks = JSON.parse(data);
-                    let rentedBooksTableBody = '';
-                    rentedBooks.forEach(book => {
-                        rentedBooksTableBody += `<tr>
-                            <td>${book.Admin_Name}</td>
-                            <td>${book.Borrower_Name}</td>
-                            <td>${book.Book_Title}</td>
-                            <td>${book.Borrow_Date}</td>
-                            <td>${book.Return_Date}</td>
-                        </tr>`;
-                    });
-                    $('#rentedBooksTable tbody').html(rentedBooksTableBody);
-                } catch (e) {
-                    console.error('Error parsing JSON:', e);
-                }
+                const rentedBooks = JSON.parse(data);
+                let rentedBooksTableBody = '';
+                rentedBooks.forEach(book => {
+                    rentedBooksTableBody += `<tr>
+                        <td>${book.Borrow_ID}</td>
+                        <td>${book.UserName}</td>
+                        <td>${book.AdminName}</td>
+                        <td>${book.Borrow_Date}</td>
+                        <td>${book.Return_Date}</td>
+                        <td>${book.Status}</td>
+                        <td>
+                            <button class="updateStatusButton" data-borrow-id="${book.Borrow_ID}">Update</button>
+                        </td>
+                    </tr>`;
+                });
+                $('#rentedBooksTable tbody').html(rentedBooksTableBody);
+            });
+
+            $('#backButton').click(function() {
+                window.location.href = 'index.html';
+            });
+
+            $(document).on('click', '.updateStatusButton', function() {
+                const borrowId = $(this).data('borrow-id');
+                window.location.href = `update_rent.html?borrow_id=${borrowId}`;
             });
         });
     </script>

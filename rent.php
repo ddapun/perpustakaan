@@ -19,21 +19,33 @@ try {
     // Insert into Book Borrowing Details Table
     $stmt = $conn->prepare("INSERT INTO book_borrowing_details (Borrow_ID, ISBN) VALUES (?, ?)");
     foreach ($isbns as $isbn) {
-        $stmt->bind_param("is", $borrow_id, $isbn);
-        $stmt->execute();
+        // Check book quantity
+        $stmtCheck = $conn->prepare("SELECT Quantity FROM book WHERE ISBN = ?");
+        $stmtCheck->bind_param("s", $isbn);
+        $stmtCheck->execute();
+        $result = $stmtCheck->get_result();
+        $book = $result->fetch_assoc();
+
+        if ($book['Quantity'] > 0) {
+            // Decrement book quantity
+            $stmtUpdate = $conn->prepare("UPDATE book SET Quantity = Quantity - 1 WHERE ISBN = ?");
+            $stmtUpdate->bind_param("s", $isbn);
+            $stmtUpdate->execute();
+
+            $stmt->bind_param("is", $borrow_id, $isbn);
+            $stmt->execute();
+        } else {
+            throw new Exception("Book with ISBN $isbn is out of stock!");
+        }
     }
 
     $conn->commit();
-// Redirect back to index.html with a success message
-    header("Location: index.html?status=success");
-    exit();
+    echo "Books rented successfully!";
+    header('Location: index.html');
 } catch (Exception $e) {
     $conn->rollback();
-    // Redirect back to index.html with an error message
-    header("Location: index.html?status=error&message=" . urlencode($e->getMessage()));
-    exit();
+    echo "Failed to rent books: " . $e->getMessage();
 }
 
 $conn->close();
 ?>
-
