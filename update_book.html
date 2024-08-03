@@ -1,46 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Update Book</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      .container {
+        max-width: 600px;
+        margin-top: 50px;
+      }
+      .form-group label {
+        font-weight: bold;
+      }
+      .btn-custom {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <h1>Update Book</h1>
-        <form id="updateBookForm" method="post" action="update_book.php">
-            <div>
-                <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn" readonly>
-            </div>
-            <div>
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-            <div>
-                <label for="author">Author:</label>
-                <input type="text" id="author" name="author" required>
-            </div>
-            <div>
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" required>
-            </div>
-            <button type="submit">Update Book</button>
-            <button type="button" id="backButton">Back</button>
-        </form>
+      <h1 class="text-center mb-4">Update Book</h1>
+      <form id="updateBookForm" method="post" action="update_book.php">
+        <div class="form-group">
+          <label for="isbn">ISBN:</label>
+          <input type="text" class="form-control" id="isbn" name="isbn" readonly />
+        </div>
+        <div class="form-group">
+          <label for="title">Title:</label>
+          <input type="text" class="form-control" id="title" name="title" required />
+        </div>
+        <div class="form-group">
+          <label for="author">Author:</label>
+          <input type="text" class="form-control" id="author" name="author" required />
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-custom">Update Book</button>
+          <button type="button" id="backButton" class="btn btn-secondary">Back</button>
+        </div>
+      </form>
     </div>
     <script>
-        // Populate form fields with data from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('isbn').value = urlParams.get('isbn');
-        document.getElementById('title').value = urlParams.get('title');
-        document.getElementById('author').value = urlParams.get('author');
-        document.getElementById('quantity').value = urlParams.get('quantity');
+      // Populate form fields with data from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      document.getElementById("isbn").value = urlParams.get("isbn");
+      document.getElementById("title").value = urlParams.get("title");
+      document.getElementById("author").value = urlParams.get("author");
 
-        document.getElementById('backButton').addEventListener('click', function() {
-            window.location.href = 'available_books.html';
-        });
+      document.getElementById("backButton").addEventListener("click", function () {
+        window.location.href = "available_books.html";
+      });
     </script>
-</body>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
 </html>

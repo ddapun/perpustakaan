@@ -1,17 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Book Renting</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Library Book Renting</h1>
-        <button onclick="window.location.href='available_books.html'">Available Books</button>
-        <button onclick="window.location.href='rent_books.html'">Rent Books</button>
-        <button onclick="window.location.href='rented_books.html'">Rented Books</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perpustakaan</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .top-bar {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+      .top-bar img {
+        height: 40px;
+        margin-right: 10px;
+      }
+      .sidebar {
+        height: calc(100vh - 60px);
+        position: fixed;
+        top: 75px;
+        left: 0;
+        width: 250px;
+        background-color: #343a40;
+        padding-top: 50px;
+        transition: width 0.3s, padding 0.3s;
+        overflow: hidden;
+        z-index: 1000;
+      }
+      .sidebar.collapsed {
+        width: 80px;
+        padding-top: 20px;
+      }
+      .sidebar a {
+        padding: 20px 15px;
+        text-align: center;
+        display: block;
+        color: white;
+        text-decoration: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      .sidebar.collapsed a {
+        opacity: 0;
+      }
+      .sidebar a:hover {
+        background-color: #007bff;
+        color: white;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .content.collapsed {
+        margin-left: 80px;
+      }
+      .main-content {
+        margin-top: 60px;
+      }
+      .toggle-btn {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        z-index: 1001;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="d-flex align-items-center">
+        <img src="icon_kukar.png" alt="Logo" />
+        <h1 class="ml-2">Perpustakaan</h1>
+      </div>
     </div>
-</body>
+
+    <div class="sidebar" id="sidebar">
+      <span class="toggle-btn btn btn-primary" id="toggle-btn">☰</span>
+      <a href="index.html">Pinjam Buku</a>
+      <a href="rented_books.html">Lihat Data Peminjam</a>
+      <a href="available_books.html">Buku</a>
+      <a href="add_book.html">Tambah Buku</a>
+    </div>
+
+    <div class="content main-content" id="content">
+      <div id="pinjam">
+        <div class="container">
+          <h1>Library Book Renting</h1>
+          <form id="rentForm" method="post" action="rent.php">
+            <div class="form-group">
+              <label for="user_id">User ID:</label>
+              <input type="text" class="form-control" id="user_id" name="user_id" required />
+            </div>
+            <div class="form-group">
+              <label for="admin_id">Admin ID:</label>
+              <input type="text" class="form-control" id="admin_id" name="admin_id" required />
+            </div>
+            <div class="form-group">
+              <label for="borrow_date">Borrow Date:</label>
+              <input type="date" class="form-control" id="borrow_date" name="borrow_date" required />
+            </div>
+            <div class="form-group">
+              <label for="return_date">Return Date:</label>
+              <input type="date" class="form-control" id="return_date" name="return_date" required />
+            </div>
+            <div class="form-group">
+              <label>Books:</label>
+              <div id="books">
+                <div class="book form-group d-flex align-items-center">
+                  <input type="text" class="form-control" name="isbn[]" placeholder="Book ISBN" onblur="fetchBookDetails(this)" required />
+                  <input type="text" class="form-control ml-2" name="title[]" placeholder="Book Title" onblur="fetchBookDetails(this)" required />
+                  <button type="button" class="btn btn-danger ml-2 remove-book">Remove</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary" id="addBook">Add Book</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Rent Books</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document.getElementById("toggle-btn").addEventListener("click", function () {
+        var sidebar = document.getElementById("sidebar");
+        var content = document.getElementById("content");
+        var links = sidebar.getElementsByTagName("a");
+
+        if (sidebar.classList.contains("collapsed")) {
+          sidebar.classList.remove("collapsed");
+          content.classList.remove("collapsed");
+          setTimeout(function () {
+            for (var i = 0; i < links.length; i++) {
+              links[i].style.opacity = "1";
+            }
+          }, 300); // wait for sidebar to expand
+        } else {
+          for (var i = 0; i < links.length; i++) {
+            links[i].style.opacity = "0";
+          }
+          setTimeout(function () {
+            sidebar.classList.add("collapsed");
+            content.classList.add("collapsed");
+          }, 300); // wait for opacity transitionsd
+        }
+      });
+
+      document.getElementById("addBook").addEventListener("click", function () {
+        var booksDiv = document.getElementById("books");
+        var newBookDiv = document.createElement("div");
+        newBookDiv.classList.add("book", "form-group", "d-flex", "align-items-center");
+        newBookDiv.innerHTML = `
+        <input type="text" class="form-control" name="isbn[]" placeholder="Book ISBN" onblur="fetchBookDetails(this)" required />
+        <input type="text" class="form-control ml-2" name="title[]" placeholder="Book Title" onblur="fetchBookDetails(this)" required />
+        <button type="button" class="btn btn-danger ml-2 remove-book">Remove</button>
+      `;
+        booksDiv.appendChild(newBookDiv);
+      });
+
+      document.getElementById("books").addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-book")) {
+          e.target.parentElement.remove();
+        }
+      });
+
+      function fetchBookDetails(input) {
+        var parentDiv = input.closest(".book");
+        var isbnInput = parentDiv.querySelector('input[name="isbn[]"]');
+        var titleInput = parentDiv.querySelector('input[name="title[]"]');
+        var isbn = isbnInput.value;
+        var title = titleInput.value;
+
+        if (isbn || title) {
+          $.ajax({
+            url: "fetch_book_details.php",
+            type: "POST",
+            data: { isbn: isbn, title: title },
+            dataType: "json",
+            success: function (response) {
+              if (response.status === "success") {
+                isbnInput.value = response.data.isbn;
+                titleInput.value = response.data.title;
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            },
+          });
+        }
+      }
+    </script>
+  </body>
 </html>

@@ -1,32 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Book</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Add Book</h1>
-        <button class="back-button" onclick="window.location.href='available_books.html'">Back</button>
-
-        <!-- Add Book Form -->
-        <form id="addBookForm" method="post" action="add_book.php">
-            <div>
-                <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn" required>
-            </div>
-            <div>
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-            <div>
-                <label for="author">Author:</label>
-                <input type="text" id="author" name="author" required>
-            </div>
-            <button class="submit-button" type="submit">Add Book</button>
-        </form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perpustakaan</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        width: 80%;
+        margin: 20px;
+      }
+      .top-bar {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+      .top-bar img {
+        height: 40px;
+        margin-right: 10px;
+      }
+      .sidebar {
+        height: calc(100vh - 60px); /* Adjust height to account for the top bar */
+        position: fixed;
+        top: 75px; /* Add top margin to account for the top bar */
+        left: 0;
+        width: 250px;
+        background-color: #343a40;
+        padding-top: 50px;
+        transition: width 0.3s, padding 0.3s;
+        overflow: hidden;
+        z-index: 1000;
+      }
+      .sidebar.collapsed {
+        width: 80px;
+        padding-top: 20px;
+      }
+      .sidebar a {
+        padding: 20px 15px;
+        text-align: center;
+        display: block;
+        color: white;
+        text-decoration: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      .sidebar.collapsed a {
+        opacity: 0;
+      }
+      .sidebar a:hover {
+        background-color: #007bff;
+        color: white;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .content.collapsed {
+        margin-left: 80px;
+      }
+      .main-content {
+        margin-top: 60px; /* Add margin to avoid content being hidden behind the top bar */
+      }
+      .toggle-btn {
+        position: absolute;
+        top: 10px;
+        left: 20px; /* Adjusted to position inside the sidebar */
+        z-index: 1001;
+        cursor: pointer;
+      }
+      .btn-secondary {
+        margin-bottom: 10px;
+      }
+      .back-button {
+        border-radius: 6px;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="d-flex align-items-center">
+        <img src="icon_kukar.png" alt="Logo" />
+        <h1 class="ml-2">Perpustakaan</h1>
+      </div>
     </div>
-</body>
+
+    <div class="sidebar" id="sidebar">
+      <span class="toggle-btn btn btn-primary" id="toggle-btn">☰</span>
+      <a href="index.html">Pinjam Buku</a>
+      <a href="rented_books.html">Lihat Data Peminjam</a>
+      <a href="available_books.html">Buku</a>
+      <a href="add_book.html">Tambah Buku</a>
+    </div>
+
+    <div class="content main-content" id="content">
+      <div class="container">
+        <h1>Tambah Buku</h1>
+        <button class="back-button" onclick="window.location.href='available_books.html'">Kembali</button>
+
+        <!-- Form Tambah Buku -->
+        <form id="addBookForm" method="post" action="add_book.php">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>ISBN</th>
+                <th>Judul</th>
+                <th>Penulis</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="bookTableBody">
+              <!-- Template untuk input buku -->
+              <tr>
+                <td><input type="text" class="form-control" name="isbn[]" required /></td>
+                <td><input type="text" class="form-control" name="title[]" required /></td>
+                <td><input type="text" class="form-control" name="author[]" required /></td>
+                <td><button type="button" class="btn btn-danger ml-2 remove-book">Hapus</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-secondary" id="addRowBtn">Tambah Baris</button>
+          <button class="submit-button btn btn-primary" type="submit">Tambah Buku</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Fungsi untuk menambahkan baris baru ke tabel
+        $("#addRowBtn").click(function () {
+          var newRow = `
+                    <tr>
+                        <td><input type="text" class="form-control" name="isbn[]" required /></td>
+                        <td><input type="text" class="form-control" name="title[]" required /></td>
+                        <td><input type="text" class="form-control" name="author[]" required /></td>
+                        <td><button type="button" class="btn btn-danger ml-2 remove-book">Hapus</button></td>
+                    </tr>`;
+          $("#bookTableBody").append(newRow);
+        });
+
+        // Fungsi untuk menghapus baris dari tabel
+        $(document).on("click", ".remove-book", function () {
+          $(this).closest("tr").remove();
+        });
+
+        // Fungsi untuk toggle sidebar
+        $("#toggle-btn").click(function () {
+          $("#sidebar").toggleClass("collapsed");
+          $("#content").toggleClass("collapsed");
+        });
+
+        // Handle form submission with AJAX
+        $("#addBookForm").submit(function (e) {
+          e.preventDefault(); // Prevent default form submission
+          $.ajax({
+            url: "add_book.php",
+            type: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+              alert(response.message);
+              if (response.success) {
+                // Clear the form if successful
+                $("#addBookForm")[0].reset();
+              }
+            },
+            error: function (xhr, status, error) {
+              alert("Error: " + xhr.responseText);
+            },
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
