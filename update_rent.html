@@ -1,73 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Update Rent</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      .container {
+        max-width: 600px;
+        margin-top: 50px;
+      }
+      .form-group label {
+        font-weight: bold;
+      }
+      .btn-custom {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
     <div class="container">
-        <h1>Update Rent</h1>
-        <form id="updateRentForm">
-            <input type="hidden" id="borrowId" name="borrow_id">
-            <div>
-                <label for="userId">User ID:</label>
-                <input type="text" id="userId" name="user_id" required>
-            </div>
-            <div>
-                <label for="adminId">Admin ID:</label>
-                <input type="text" id="adminId" name="admin_id" required>
-            </div>
-            <div>
-                <label for="borrowDate">Borrow Date:</label>
-                <input type="date" id="borrowDate" name="borrow_date" required>
-            </div>
-            <div>
-                <label for="returnDate">Return Date:</label>
-                <input type="date" id="returnDate" name="return_date" required>
-            </div>
-            <div>
-                <label for="status">Status:</label>
-                <select id="status" name="status" required>
-                    <option value="On Rent">On Rent</option>
-                    <option value="Done">Done</option>
-                    <option value="Late">Late</option>
-                </select>
-            </div>
-            <button type="submit">Update Rent</button>
-        </form>
-        <button id="backButton">Back</button>
+      <h1 class="text-center mb-4">Update Rent</h1>
+      <form id="updateRentForm">
+        <input type="hidden" id="borrowId" name="borrow_id" />
+        <div class="form-group">
+          <label for="userId">User ID:</label>
+          <input type="text" class="form-control" id="userId" name="user_id" required />
+        </div>
+        <div class="form-group">
+          <label for="adminId">Admin ID:</label>
+          <input type="text" class="form-control" id="adminId" name="admin_id" required />
+        </div>
+        <div class="form-group">
+          <label for="borrowDate">Borrow Date:</label>
+          <input type="date" class="form-control" id="borrowDate" name="borrow_date" required />
+        </div>
+        <div class="form-group">
+          <label for="returnDate">Return Date:</label>
+          <input type="date" class="form-control" id="returnDate" name="return_date" required />
+        </div>
+        <div class="form-group">
+          <label for="status">Status:</label>
+          <select id="status" name="status" class="form-control" required>
+            <option value="On Rent">On Rent</option>
+            <option value="Done">Done</option>
+            <option value="Late">Late</option>
+          </select>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary btn-custom">Update Rent</button>
+          <button type="button" id="backButton" class="btn btn-secondary">Back</button>
+        </div>
+      </form>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const borrowId = urlParams.get('borrow_id');
-            $('#borrowId').val(borrowId);
+      $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const borrowId = urlParams.get("borrow_id");
+        $("#borrowId").val(borrowId);
 
-            // Fetch current rental data
-            $.get('fetch_rent.php', { borrow_id: borrowId }, function(data) {
-                const rentData = JSON.parse(data);
-                $('#userId').val(rentData.ID_User);
-                $('#adminId').val(rentData.ID_Admin);
-                $('#borrowDate').val(rentData.Borrow_Date);
-                $('#returnDate').val(rentData.Return_Date);
-                $('#status').val(rentData.Status);
-            });
-
-            $('#updateRentForm').submit(function(e) {
-                e.preventDefault();
-                $.post('update_rent.php', $(this).serialize(), function(response) {
-                    alert(response);
-                    window.location.href = 'rented_books.html';
-                });
-            });
-
-            $('#backButton').click(function() {
-                window.location.href = 'rented_books.html';
-            });
+        // Fetch current rental data
+        $.get("fetch_rent.php", { borrow_id: borrowId }, function (data) {
+          const rentData = JSON.parse(data);
+          $("#userId").val(rentData.ID_User);
+          $("#adminId").val(rentData.ID_Admin);
+          $("#borrowDate").val(rentData.Borrow_Date);
+          $("#returnDate").val(rentData.Return_Date);
+          $("#status").val(rentData.Status);
         });
+
+        $("#updateRentForm").submit(function (e) {
+          e.preventDefault();
+          $.post("update_rent.php", $(this).serialize(), function (response) {
+            alert(response);
+            window.location.href = "rented_books.html";
+          });
+        });
+
+        $("#backButton").click(function () {
+          window.location.href = "rented_books.html";
+        });
+      });
     </script>
-</body>
+  </body>
 </html>

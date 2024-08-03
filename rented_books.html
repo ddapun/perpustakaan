@@ -1,41 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rented Books</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Rented Books</h1>
-        <table id="rentedBooksTable" border="1">
-            <thead>
-                <tr>
-                    <th>Borrow ID</th>
-                    <th>User Name</th>
-                    <th>Admin Name</th>
-                    <th>Borrow Date</th>
-                    <th>Return Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be populated by JavaScript -->
-            </tbody>
-        </table>
-        <button id="backButton">Back</button>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        width: 80%;
+        margin: 20px;
+      }
+      .top-bar {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+      .top-bar img {
+        height: 40px;
+        margin-right: 10px;
+      }
+      .sidebar {
+        height: calc(100vh - 60px); /* Adjust height to account for the top bar */
+        position: fixed;
+        top: 75px; /* Add top margin to account for the top bar */
+        left: 0;
+        width: 250px;
+        background-color: #343a40;
+        padding-top: 50px;
+        transition: width 0.3s, padding 0.3s;
+        overflow: hidden;
+        z-index: 1000;
+      }
+      .sidebar.collapsed {
+        width: 80px;
+        padding-top: 20px;
+      }
+      .sidebar a {
+        padding: 20px 15px;
+        text-align: center;
+        display: block;
+        color: white;
+        text-decoration: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      .sidebar.collapsed a {
+        opacity: 0;
+      }
+      .sidebar a:hover {
+        background-color: #007bff;
+        color: white;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .content.collapsed {
+        margin-left: 80px;
+      }
+      .main-content {
+        margin-top: 60px; /* Add margin to avoid content being hidden behind the top bar */
+      }
+      .toggle-btn {
+        position: absolute;
+        top: 10px;
+        left: 20px; /* Adjusted to position inside the sidebar */
+        z-index: 1001;
+        cursor: pointer;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="d-flex align-items-center">
+        <img src="icon_kukar.png" alt="Logo" />
+        <h1 class="ml-2">Perpustakaan</h1>
+      </div>
     </div>
+
+    <div class="sidebar" id="sidebar">
+      <span class="toggle-btn btn btn-primary" id="toggle-btn">☰</span>
+      <a href="index.html">Pinjam Buku</a>
+      <a href="rented_books.html">Lihat Data Peminjam</a>
+      <a href="available_books.html">Buku</a>
+      <a href="add_book.html">Tambah Buku</a>
+    </div>
+
+    <div class="content main-content" id="content">
+      <div class="container">
+        <h1>Rented Books</h1>
+        <table id="rentedBooksTable" class="table table-striped table-bordered">
+          <thead class="thead-dark">
+            <tr>
+              <th>Borrow ID</th>
+              <th>User Name</th>
+              <th>Admin Name</th>
+              <th>Borrow Date</th>
+              <th>Return Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be populated by JavaScript -->
+          </tbody>
+        </table>
+        <button id="saveToExcelButton" class="btn btn-success">Save to Excel</button>
+        <button id="backButton" class="btn btn-secondary">Back</button>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Fetch and display rented books from the database
-            $.get('fetch_rented_books.php', function(data) {
-                const rentedBooks = JSON.parse(data);
-                let rentedBooksTableBody = '';
-                rentedBooks.forEach(book => {
-                    rentedBooksTableBody += `<tr>
+      document.getElementById("toggle-btn").addEventListener("click", function () {
+        var sidebar = document.getElementById("sidebar");
+        var content = document.getElementById("content");
+        var links = sidebar.getElementsByTagName("a");
+
+        if (sidebar.classList.contains("collapsed")) {
+          sidebar.classList.remove("collapsed");
+          content.classList.remove("collapsed");
+          setTimeout(function () {
+            for (var i = 0; i < links.length; i++) {
+              links[i].style.opacity = "1";
+            }
+          }, 300); // wait for sidebar to expand
+        } else {
+          for (var i = 0; i < links.length; i++) {
+            links[i].style.opacity = "0";
+          }
+          setTimeout(function () {
+            sidebar.classList.add("collapsed");
+            content.classList.add("collapsed");
+          }, 300); // wait for opacity transition
+        }
+      });
+      $(document).ready(function () {
+        // Fetch and display rented books from the database
+        $.get("fetch_rented_books.php", function (data) {
+          const rentedBooks = JSON.parse(data);
+          let rentedBooksTableBody = "";
+          rentedBooks.forEach((book) => {
+            rentedBooksTableBody += `<tr>
                         <td>${book.Borrow_ID}</td>
                         <td>${book.UserName}</td>
                         <td>${book.AdminName}</td>
@@ -43,22 +166,29 @@
                         <td>${book.Return_Date}</td>
                         <td>${book.Status}</td>
                         <td>
-                            <button class="updateStatusButton" data-borrow-id="${book.Borrow_ID}">Update</button>
+                            <button class="updateStatusButton btn btn-primary btn-sm" data-borrow-id="${book.Borrow_ID}">Update</button>
                         </td>
                     </tr>`;
-                });
-                $('#rentedBooksTable tbody').html(rentedBooksTableBody);
-            });
-
-            $('#backButton').click(function() {
-                window.location.href = 'index.html';
-            });
-
-            $(document).on('click', '.updateStatusButton', function() {
-                const borrowId = $(this).data('borrow-id');
-                window.location.href = `update_rent.html?borrow_id=${borrowId}`;
-            });
+          });
+          $("#rentedBooksTable tbody").html(rentedBooksTableBody);
         });
+
+        $("#backButton").click(function () {
+          window.location.href = "index.html";
+        });
+
+        $(document).on("click", ".updateStatusButton", function () {
+          const borrowId = $(this).data("borrow-id");
+          window.location.href = `update_rent.html?borrow_id=${borrowId}`;
+        });
+
+        $("#saveToExcelButton").click(function () {
+          var wb = XLSX.utils.book_new();
+          var ws = XLSX.utils.table_to_sheet(document.getElementById("rentedBooksTable"));
+          XLSX.utils.book_append_sheet(wb, ws, "Rented Books");
+          XLSX.writeFile(wb, "rented_books.xlsx");
+        });
+      });
     </script>
-</body>
+  </body>
 </html>

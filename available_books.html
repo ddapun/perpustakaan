@@ -1,79 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Available Books</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Available Books</h1>
-        <table id="booksTable" border="1">
-            <thead>
-                <tr>
-                    <th>ISBN</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Quantity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Rows will be populated by JavaScript -->
-            </tbody>
-        </table>
-        <button id="addBookButton">Add Book</button>
-        <button id="backButton">Back</button>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        width: 80%;
+        margin: 20px;
+      }
+      .top-bar {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+      }
+      .top-bar img {
+        height: 40px;
+        margin-right: 10px;
+      }
+      .sidebar {
+        height: calc(100vh - 60px);
+        position: fixed;
+        top: 75px;
+        left: 0;
+        width: 250px;
+        background-color: #343a40;
+        padding-top: 50px;
+        transition: width 0.3s, padding 0.3s;
+        overflow: hidden;
+        z-index: 1000;
+      }
+      .sidebar.collapsed {
+        width: 80px;
+        padding-top: 20px;
+      }
+      .sidebar a {
+        padding: 20px 15px;
+        text-align: center;
+        display: block;
+        color: white;
+        text-decoration: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+      }
+      .sidebar.collapsed a {
+        opacity: 0;
+      }
+      .sidebar a:hover {
+        background-color: #007bff;
+        color: white;
+      }
+      .content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .content.collapsed {
+        margin-left: 80px;
+      }
+      .main-content {
+        margin-top: 60px;
+      }
+      .toggle-btn {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        z-index: 1001;
+        cursor: pointer;
+      }
+      .btn-primary {
+        margin-right: 10px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="d-flex align-items-center">
+        <img src="icon_kukar.png" alt="Logo" />
+        <h1 class="ml-2">Perpustakaan</h1>
+      </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <div class="sidebar" id="sidebar">
+      <span class="toggle-btn btn btn-primary" id="toggle-btn">☰</span>
+      <a href="index.html">Pinjam Buku</a>
+      <a href="rented_books.html">Lihat Data Peminjam</a>
+      <a href="available_books.html">Buku</a>
+      <a href="add_book.html">Tambah Buku</a>
+    </div>
+
+    <div class="content main-content" id="content">
+      <div class="container">
+        <div class="btn-group" role="group">
+          <button id="addBookButton" class="btn btn-primary">Add Book</button>
+          <button id="backButton" class="btn btn-secondary">Back</button>
+        </div>
+        <h1>Available Books</h1>
+        <div class="form-group">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search for books..." />
+        </div>
+        <table id="booksTable" class="table table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th>ISBN</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be populated by JavaScript -->
+          </tbody>
+        </table>
+        <!--<div class="btn-group" role="group">
+          <button id="addBookButton" class="btn btn-primary">Add Book</button>
+          <button id="backButton" class="btn btn-secondary">Back</button>
+        </div> -->
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Fetch and display books from the database
-            $.get('fetch_books.php', function(data) {
-                const books = JSON.parse(data);
-                let booksTableBody = '';
-                books.forEach(book => {
-                    booksTableBody += `<tr>
-                        <td>${book.ISBN}</td>
-                        <td>${book.Title}</td>
-                        <td>${book.Author}</td>
-                        <td>${book.Quantity}</td>
-                        <td>
-                            <button class="updateButton" data-isbn="${book.ISBN}" data-title="${book.Title}" data-author="${book.Author}" data-quantity="${book.Quantity}">Update</button>
-                            <button class="deleteButton" data-isbn="${book.ISBN}">Delete</button>
-                        </td>
-                    </tr>`;
-                });
-                $('#booksTable tbody').html(booksTableBody);
-            });
+      document.getElementById("toggle-btn").addEventListener("click", function () {
+        var sidebar = document.getElementById("sidebar");
+        var content = document.getElementById("content");
+        var links = sidebar.getElementsByTagName("a");
 
-            $('#addBookButton').click(function() {
-                window.location.href = 'add_book.html';
-            });
+        if (sidebar.classList.contains("collapsed")) {
+          sidebar.classList.remove("collapsed");
+          content.classList.remove("collapsed");
+          setTimeout(function () {
+            for (var i = 0; i < links.length; i++) {
+              links[i].style.opacity = "1";
+            }
+          }, 300);
+        } else {
+          for (var i = 0; i < links.length; i++) {
+            links[i].style.opacity = "0";
+          }
+          setTimeout(function () {
+            sidebar.classList.add("collapsed");
+            content.classList.add("collapsed");
+          }, 300);
+        }
+      });
 
-            $('#backButton').click(function() {
-                window.location.href = 'index.html';
+      $(document).ready(function () {
+        function fetchBooks(query = "") {
+          $.get("fetch_books.php", { search: query }, function (data) {
+            const books = JSON.parse(data);
+            let booksTableBody = "";
+            books.forEach((book) => {
+              booksTableBody += `<tr>
+                            <td>${book.ISBN}</td>
+                            <td>${book.Title}</td>
+                            <td>${book.Author}</td>
+                            <td>
+                                <button class="btn btn-warning updateButton" data-isbn="${book.ISBN}" data-title="${book.Title}" data-author="${book.Author}">Update</button>
+                                <button class="btn btn-danger deleteButton" data-isbn="${book.ISBN}">Delete</button>
+                            </td>
+                        </tr>`;
             });
+            $("#booksTable tbody").html(booksTableBody);
+          });
+        }
 
-            $(document).on('click', '.updateButton', function() {
-                const isbn = $(this).data('isbn');
-                const title = $(this).data('title');
-                const author = $(this).data('author');
-                const quantity = $(this).data('quantity');
-                window.location.href = `update_book.html?isbn=${isbn}&title=${title}&author=${author}&quantity=${quantity}`;
-            });
+        // Initial fetch
+        fetchBooks();
 
-            $(document).on('click', '.deleteButton', function() {
-                const isbn = $(this).data('isbn');
-                if (confirm("Are you sure you want to delete this book?")) {
-                    $.post('delete_book.php', { isbn }, function(response) {
-                        alert(response);
-                        location.reload();
-                    });
-                }
-            });
+        $("#searchInput").on("input", function () {
+          const query = $(this).val();
+          fetchBooks(query);
         });
+
+        $("#addBookButton").click(function () {
+          window.location.href = "add_book.html";
+        });
+
+        $("#backButton").click(function () {
+          window.location.href = "index.html";
+        });
+
+        $(document).on("click", ".updateButton", function () {
+          const isbn = $(this).data("isbn");
+          const title = $(this).data("title");
+          const author = $(this).data("author");
+          window.location.href = `update_book.html?isbn=${isbn}&title=${title}&author=${author}`;
+        });
+
+        $(document).on("click", ".deleteButton", function () {
+          const isbn = $(this).data("isbn");
+          if (confirm("Are you sure you want to delete this book?")) {
+            $.post("delete_book.php", { isbn }, function (response) {
+              alert(response);
+              fetchBooks();
+            });
+          }
+        });
+      });
     </script>
-</body>
+  </body>
 </html>
