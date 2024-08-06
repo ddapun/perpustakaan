@@ -7,6 +7,24 @@ $borrow_date = $_POST['borrow_date'];
 $return_date = $_POST['return_date'];
 $isbns = $_POST['isbn'];
 
+// Validasi tanggal
+$current_date = date('Y-m-d');
+if ($borrow_date !== $current_date) {
+    echo "<script>
+            alert('Tanggal Peminjaman harus tanggal sekarang.');
+            window.location.href = 'index.html';
+          </script>";
+    exit();
+}
+
+if ($return_date < $borrow_date) {
+    echo "<script>
+            alert('Tanggal Pengembalian tidak boleh sebelum Tanggal Peminjaman.');
+            window.location.href = 'index.html';
+          </script>";
+    exit();
+}
+
 $conn->begin_transaction();
 
 try {
