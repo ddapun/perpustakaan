@@ -123,7 +123,6 @@
         <button id="saveToExcelButton" class="btn btn-success">Save to Excel</button>
         <button id="backButton" class="btn btn-secondary">Back</button>
       </div>
-
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
@@ -182,12 +181,12 @@
           const borrowId = $(this).data("borrow-id");
           window.location.href = `update_rent.html?borrow_id=${borrowId}`;
         });
+
         $("#saveToExcelButton").click(function () {
           var wb = XLSX.utils.book_new();
           var ws = XLSX.utils.table_to_sheet(document.getElementById("rentedBooksTable"));
           XLSX.utils.book_append_sheet(wb, ws, "Rented Books");
           XLSX.writeFile(wb, "rented_books.xlsx");
-
         });
       });
     </script>
