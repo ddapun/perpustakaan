@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Available Books</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" />
+
     <link rel="stylesheet" href="./styles.css" />
     <style>
       body {
@@ -18,7 +20,7 @@
       }
       .top-bar {
         width: 100%;
-        background-color: #007bff;
+        background-color: #389c3d;
         color: white;
         padding: 10px;
         display: flex;
@@ -30,8 +32,9 @@
         z-index: 1000;
       }
       .top-bar img {
-        height: 40px;
+        height: 55px;
         margin-right: 10px;
+        margin-left: 60px;
       }
       .sidebar {
         height: calc(100vh - 60px);
@@ -63,6 +66,7 @@
       }
       .sidebar a:hover {
         background-color: #007bff;
+        border-radius: 20px;
         color: white;
       }
       .content {
@@ -87,13 +91,33 @@
         margin-right: 10px;
         border-radius: 5px;
       }
+      .partner-logo-container {
+        transition: opacity 0.3s, display 0.3s;
+      }
+      .partner-logo {
+        border-radius: 50%;
+        height: 100px;
+        display: block;
+        margin: 50px auto 20px auto;
+      }
+      .partner-logo-container.collapsed {
+        opacity: 0;
+        display: none;
+      }
+      figcaption {
+        color: white;
+        font-family: "Roboto", sans-serif; /* Menggunakan font Roboto */
+        font-size: 14px; /* Ukuran font */
+        text-align: center; /* Pusatkan teks */
+        margin-top: 10px; /* Jarak di atas teks */
+      }
     </style>
   </head>
   <body>
     <div class="top-bar">
       <div class="d-flex align-items-center">
         <img src="icon_kukar.png" alt="Logo" />
-        <h1 class="ml-2">Perpustakaan</h1>
+        <h1 class="ml-2">Perpustakaan Desa Ponoragan</h1>
       </div>
     </div>
 
@@ -103,6 +127,10 @@
       <a href="rented_books.html">Lihat Data Peminjam</a>
       <a href="available_books.html">Buku</a>
       <a href="add_book.html">Tambah Buku</a>
+      <div class="partner-logo-container" id="partnerLogoContainer">
+        <img src="logokkn.jpg" alt="Partner Logo" class="partner-logo" />
+        <figcaption>&copy; 2024 KKN UNMUL 51</figcaption>
+      </div>
     </div>
 
     <div class="content main-content" id="content">
@@ -141,24 +169,27 @@
       document.getElementById("toggle-btn").addEventListener("click", function () {
         var sidebar = document.getElementById("sidebar");
         var content = document.getElementById("content");
+        var logoContainer = document.getElementById("partnerLogoContainer");
         var links = sidebar.getElementsByTagName("a");
 
         if (sidebar.classList.contains("collapsed")) {
           sidebar.classList.remove("collapsed");
           content.classList.remove("collapsed");
+          logoContainer.classList.remove("collapsed");
           setTimeout(function () {
             for (var i = 0; i < links.length; i++) {
               links[i].style.opacity = "1";
             }
-          }, 300);
+          }, 300); // wait for sidebar to expand
         } else {
           for (var i = 0; i < links.length; i++) {
             links[i].style.opacity = "0";
           }
+          logoContainer.classList.add("collapsed");
           setTimeout(function () {
             sidebar.classList.add("collapsed");
             content.classList.add("collapsed");
-          }, 300);
+          }, 300); // wait for opacity transitions
         }
       });
 
