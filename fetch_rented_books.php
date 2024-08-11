@@ -1,10 +1,17 @@
 <?php
 include 'config.php';
 
-$sql = "SELECT book_borrowing.Borrow_ID, user.Name AS UserName, admin.Name AS AdminName, book_borrowing.Borrow_Date, book_borrowing.Return_Date, book_borrowing.Status 
-        FROM book_borrowing
-        JOIN user ON book_borrowing.ID_User = user.ID_User
-        JOIN admin ON book_borrowing.ID_Admin = admin.ID_Admin";
+$sql = "SELECT 
+    Borrow_ID, 
+    Name AS UserName, 
+    Phone_Number,
+    Address,
+    admin.Name AS AdminName, 
+    Borrow_Date, 
+    Return_Date, 
+    Status 
+FROM book_borrowing
+JOIN admin ON book_borrowing.ID_Admin = admin.ID_Admin";
 
 $result = $conn->query($sql);
 

@@ -2,7 +2,9 @@
 include 'config.php';
 
 $borrow_id = $_POST['borrow_id'];
-$user_id = $_POST['user_id'];
+$phone_number = $_POST['phone_number']; 
+$name = $_POST['name']; 
+$address = $_POST['address']; 
 $admin_id = $_POST['admin_id'];
 $borrow_date = $_POST['borrow_date'];
 $return_date = $_POST['return_date'];
@@ -21,8 +23,16 @@ if ($return_date < $borrow_date) {
 }
 
 try {
-    $stmt = $conn->prepare("UPDATE book_borrowing SET ID_User = ?, ID_Admin = ?, Borrow_Date = ?, Return_Date = ?, Status = ? WHERE Borrow_ID = ?");
-    $stmt->bind_param("iisssi", $user_id, $admin_id, $borrow_date, $return_date, $status, $borrow_id);
+    $stmt = $conn->prepare("UPDATE book_borrowing 
+                            SET Name = ?, 
+                                Phone_Number = ?,
+                                Address = ?,
+                                ID_Admin = ?, 
+                                Borrow_Date = ?, 
+                                Return_Date = ?, 
+                                Status = ? 
+                            WHERE Borrow_ID = ?");
+    $stmt->bind_param("ssisssi", $name, $phone_number, $address, $admin_id, $borrow_date, $return_date, $status, $borrow_id);
     $stmt->execute();
     echo "Rental record updated successfully!";
 } catch (Exception $e) {

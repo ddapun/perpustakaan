@@ -1,7 +1,9 @@
 <?php
 include 'config.php';
 
-$user_id = $_POST['user_id'];
+$phone_number = $_POST['phone_number'];
+$name = $_POST['name'];
+$address = $_POST['address'];
 $admin_id = $_POST['admin_id'];
 $borrow_date = $_POST['borrow_date'];
 $return_date = $_POST['return_date'];
@@ -29,8 +31,8 @@ $conn->begin_transaction();
 
 try {
     // Insert into Book Borrowing Table
-    $stmt = $conn->prepare("INSERT INTO book_borrowing (ID_User, ID_Admin, Borrow_Date, Return_Date) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("iiss", $user_id, $admin_id, $borrow_date, $return_date);
+    $stmt = $conn->prepare("INSERT INTO book_borrowing (Name, Phone_Number, Address, ID_Admin, Borrow_Date, Return_Date) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssiss", $name, $phone_number, $address, $admin_id, $borrow_date, $return_date);
     $stmt->execute();
     $borrow_id = $stmt->insert_id;
 
